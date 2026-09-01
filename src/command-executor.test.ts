@@ -115,6 +115,8 @@ describe('CommandExecutor (one-shot mode)', () => {
 			'wsl.exe',
 			[
 				'--exec',
+				'setsid',
+				'-w',
 				'bash',
 				'-c',
 				"cd -- '/tmp/project' && echo hello; rm -rf /",
@@ -143,6 +145,8 @@ describe('CommandExecutor (one-shot mode)', () => {
 			'wsl.exe',
 			[
 				'--exec',
+				'setsid',
+				'-w',
 				'bash',
 				'-c',
 				"cd -- '/mnt/c/Users/dev/project' && ls",
@@ -202,11 +206,22 @@ describe('CommandExecutor (one-shot mode)', () => {
 		expect(executor.is_dangerous_command('sudo rm -rf /tmp/x')).toBe(
 			true,
 		);
-		expect(executor.is_dangerous_command('apt-get update')).toBe(
+		expect(executor.is_dangerous_command('shred -u /tmp/x')).toBe(
 			true,
 		);
+		// Non-destructive commands run immediately.
+		expect(executor.is_dangerous_command('apt-get update')).toBe(
+			false,
+		);
 		expect(executor.is_dangerous_command('echo hi > file')).toBe(
-			true,
+			false,
+		);
+		expect(
+			executor.is_dangerous_command('sudo apt install git'),
+		).toBe(false);
+		expect(executor.is_dangerous_command('mv a b')).toBe(false);
+		expect(executor.is_dangerous_command('chmod +x script.sh')).toBe(
+			false,
 		);
 		expect(executor.is_dangerous_command('echo safe')).toBe(false);
 		expect(executor.is_dangerous_command('format_output()')).toBe(

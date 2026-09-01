@@ -1,4 +1,6 @@
-// Define dangerous commands that require confirmation
+// Commands that can irreversibly destroy data or system state.
+// Everything else (redirects, sudo, package managers, mv, chmod,
+// kill, service, mount, ...) runs immediately.
 export const dangerous_commands = [
 	'rm',
 	'rmdir',
@@ -8,30 +10,9 @@ export const dangerous_commands = [
 	'fdisk',
 	'shutdown',
 	'reboot',
-	'>', // redirect that could overwrite
-	'>>', // append redirect that could modify files
-	'format',
-	'chmod',
-	'chown',
-	'sudo',
-	'su',
-	'passwd',
-	'mv', // moving files can be dangerous
 	'find -delete',
 	'truncate',
 	'shred',
-	'kill',
-	'pkill',
-	'service',
-	'systemctl',
-	'mount',
-	'umount',
-	'apt',
-	'apt-get',
-	'dpkg',
-	'yum',
-	'dnf',
-	'pacman',
 ] as const;
 
 function env_int(name: string, fallback: number): number {
@@ -77,6 +58,9 @@ export function build_wsl_args(trailing: string[]): string[] {
 	if (wsl_config.distro) {
 		args.push('-d', wsl_config.distro);
 	}
-	args.push('--exec', wsl_config.shell, ...trailing);
+	// setsid -w detaches the shell from any controlling TTY, so
+	// commands that would block on /dev/tty (e.g. sudo password
+	// prompts) fail fast instead of hanging the whole session.
+	args.push('--exec', 'setsid', '-w', wsl_config.shell, ...trailing);
 	return args;
 }
