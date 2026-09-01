@@ -97,7 +97,7 @@ unambiguous.
 
 ## Configuration-level latency (not code, worth knowing)
 
-The README's Claude Desktop config uses `npx -y mcp-wsl-exec`,
+The README's Claude Desktop config uses `npx -y wsl-exec-mcp`,
 which can hit the npm registry on every Claude Desktop launch and
 delays server startup. For the fastest startup, install once and
 point the config at the built entry directly:
@@ -105,9 +105,9 @@ point the config at the built entry directly:
 ```json
 {
 	"mcpServers": {
-		"mcp-wsl-exec": {
+		"wsl-exec-mcp": {
 			"command": "node",
-			"args": ["C:/path/to/mcp-wsl-exec/dist/index.js"]
+			"args": ["C:/path/to/wsl-exec-mcp/dist/index.js"]
 		}
 	}
 }

@@ -1,6 +1,6 @@
 {
-	"name": "mcp-wsl-exec",
-	"version": "0.0.4",
+	"name": "wsl-exec-mcp",
+	"version": "0.1.0",
 	"description": "A secure Model Context Protocol (MCP) server for executing commands in Windows Subsystem for Linux (WSL) with built-in safety features and validation",
 	"keywords": [
 		"bash",
@@ -36,7 +36,7 @@
 		"access": "public"
 	},
 	"bin": {
-		"mcp-wsl-exec": "./dist/index.js"
+		"wsl-exec-mcp": "./dist/index.js"
 	},
 	"files": [
 		"dist",
@@ -76,5 +76,5 @@
 		"node": ">=22.0.0"
 	},
 	"packageManager": "pnpm@11.9.0",
-	"mcpName": "io.github.dhruvkej9/mcp-wsl-exec"
+	"mcpName": "io.github.dhruvkej9/wsl-exec-mcp"
 }

@@ -1,4 +1,4 @@
-# mcp-wsl-exec
+# wsl-exec-mcp
 
 A Model Context Protocol (MCP) server for **Windows + Claude Desktop
 users** to interact with Windows Subsystem for Linux (WSL). Provides
@@ -82,9 +82,9 @@ Add this to your Cline MCP settings:
 ```json
 {
 	"mcpServers": {
-		"mcp-wsl-exec": {
+		"wsl-exec-mcp": {
 			"command": "npx",
-			"args": ["-y", "mcp-wsl-exec"]
+			"args": ["-y", "wsl-exec-mcp"]
 		}
 	}
 }
@@ -97,9 +97,9 @@ Add this to your Claude Desktop configuration:
 ```json
 {
 	"mcpServers": {
-		"mcp-wsl-exec": {
+		"wsl-exec-mcp": {
 			"command": "npx",
-			"args": ["-y", "mcp-wsl-exec"]
+			"args": ["-y", "wsl-exec-mcp"]
 		}
 	}
 }

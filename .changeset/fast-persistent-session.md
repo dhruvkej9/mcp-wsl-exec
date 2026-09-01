@@ -1,5 +1,5 @@
 ---
-'mcp-wsl-exec': minor
+'wsl-exec-mcp': minor
 ---
 
 Performance overhaul: persistent WSL session (one bash multiplexed
