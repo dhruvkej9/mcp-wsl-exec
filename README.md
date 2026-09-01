@@ -90,20 +90,49 @@ Add this to your Cline MCP settings:
 }
 ```
 
-### Claude Desktop Configuration
+#### Claude Desktop on Windows (WSL backend)
 
-Add this to your Claude Desktop configuration:
+If Claude Desktop runs on Windows but you want commands executed inside WSL,
+launch the server through `wsl.exe`:
+
+**Option 1 — npx (zero setup):**
 
 ```json
 {
 	"mcpServers": {
 		"wsl-exec-mcp": {
-			"command": "npx",
-			"args": ["-y", "wsl-exec-mcp"]
+			"command": "wsl.exe",
+			"args": ["npx", "-y", "wsl-exec-mcp"]
 		}
 	}
 }
 ```
+
+**Option 2 — local install (fastest startup, pinned version, no registry
+dependency at launch):**
+
+```bash
+mkdir -p ~/.claude-mcp/wsl-exec-mcp
+cd ~/.claude-mcp/wsl-exec-mcp
+npm install wsl-exec-mcp --ignore-scripts
+```
+
+```json
+{
+	"mcpServers": {
+		"wsl-exec-mcp": {
+			"command": "wsl.exe",
+			"args": ["node", "/home/<your-user>/.claude-mcp/wsl-exec-mcp/node_modules/wsl-exec-mcp/dist/index.js"]
+		}
+	}
+}
+```
+
+Both share the same persistent session, so per-command latency is identical
+(~3 ms). The local install only wins on startup: ~0.7 s to first command vs
+~1.0 s for warm-cache npx and ~1.8 s for cold-cache npx (registry download).
+After changing the config, fully quit Claude Desktop (tray → Quit) and
+reopen.
 
 ## API
 
