@@ -22,15 +22,18 @@
 		"windows-subsystem-linux",
 		"wsl"
 	],
-	"homepage": "https://github.com/spences10/mcp-wsl-exec#readme",
+	"homepage": "https://github.com/dhruvkej9/mcp-wsl-exec#readme",
 	"bugs": {
-		"url": "https://github.com/spences10/mcp-wsl-exec/issues"
+		"url": "https://github.com/dhruvkej9/mcp-wsl-exec/issues"
 	},
 	"license": "MIT",
-	"author": "Scott Spence",
+	"author": "dhruv kejriwal",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/spences10/mcp-wsl-exec.git"
+		"url": "https://github.com/dhruvkej9/mcp-wsl-exec.git"
+	},
+	"publishConfig": {
+		"access": "public"
 	},
 	"bin": {
 		"mcp-wsl-exec": "./dist/index.js"
@@ -73,5 +76,5 @@
 		"node": ">=22.0.0"
 	},
 	"packageManager": "pnpm@11.9.0",
-	"mcpName": "io.github.spences10/mcp-wsl-exec"
+	"mcpName": "io.github.dhruvkej9/mcp-wsl-exec"
 }

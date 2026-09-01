@@ -116,7 +116,7 @@ describe('register_tools', () => {
 
 		const pending = await execute.handler({ command: 'sudo reboot' });
 		const confirmation_id =
-			pending.content[0].text.match(/ID: (\w+)/)![1];
+			pending.content[0].text.match(/ID: ([\w-]+)/)![1];
 
 		expect(execute_spy).not.toHaveBeenCalled();
 

@@ -12,6 +12,5 @@ export interface PendingConfirmation {
 	command: string;
 	working_dir?: string;
 	timeout?: number;
-	resolve: (value: CommandResponse) => void;
-	reject: (reason?: any) => void;
+	created_at: number;
 }

@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import type { McpServer } from 'tmcp';
 import type { GenericSchema } from 'valibot';
 import * as v from 'valibot';
@@ -44,42 +45,46 @@ export function register_tools(server: McpServer<GenericSchema>) {
 		PendingConfirmation
 	>();
 
+	const CONFIRMATION_TTL_MS = 5 * 60_000;
+
+	const sweep_expired_confirmations = () => {
+		const now = Date.now();
+		for (const [id, entry] of pending_confirmations) {
+			if (now - entry.created_at > CONFIRMATION_TTL_MS) {
+				pending_confirmations.delete(id);
+			}
+		}
+	};
+
 	const execute_wsl_command = async (
 		command: string,
 		working_dir?: string,
 		timeout?: number,
 	): Promise<CommandResponse> => {
-		return new Promise((resolve, reject) => {
-			const requires_confirmation =
-				command_executor.is_dangerous_command(command);
+		if (command_executor.is_dangerous_command(command)) {
+			sweep_expired_confirmations();
+			const confirmation_id = randomUUID();
+			pending_confirmations.set(confirmation_id, {
+				command,
+				working_dir,
+				timeout,
+				created_at: Date.now(),
+			});
 
-			if (requires_confirmation) {
-				const confirmation_id = Math.random()
-					.toString(36)
-					.substring(7);
-				pending_confirmations.set(confirmation_id, {
-					command,
-					working_dir,
-					timeout,
-					resolve,
-					reject,
-				});
+			return {
+				stdout: '',
+				stderr: `Command "${command}" requires confirmation. Use confirm_command with ID: ${confirmation_id}`,
+				exit_code: null,
+				command,
+				requires_confirmation: true,
+			};
+		}
 
-				resolve({
-					stdout: '',
-					stderr: `Command "${command}" requires confirmation. Use confirm_command with ID: ${confirmation_id}`,
-					exit_code: null,
-					command,
-					requires_confirmation: true,
-				});
-				return;
-			}
-
-			command_executor
-				.execute_command(command, working_dir, timeout)
-				.then(resolve)
-				.catch(reject);
-		});
+		return command_executor.execute_command(
+			command,
+			working_dir,
+			timeout,
+		);
 	};
 
 	server.tool(
@@ -293,8 +298,13 @@ export function register_tools(server: McpServer<GenericSchema>) {
 		async ({ confirmation_id, confirm }) => {
 			try {
 				const pending = pending_confirmations.get(confirmation_id);
-				if (!pending)
+				if (
+					!pending ||
+					Date.now() - pending.created_at > CONFIRMATION_TTL_MS
+				) {
+					pending_confirmations.delete(confirmation_id);
 					throw new InvalidConfirmationError(confirmation_id);
+				}
 
 				pending_confirmations.delete(confirmation_id);
 

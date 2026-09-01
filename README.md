@@ -46,6 +46,30 @@ capabilities.
 - ⏱️ Command timeout functionality
 - 🛡️ Protection against shell injection
 
+### ⚡ Performance
+
+- Persistent WSL session: one bash stays alive inside WSL and all
+  commands are multiplexed over it, avoiding per-command `wsl.exe`
+  startup and WSL2 VM cold boots entirely (set
+  `MCP_WSL_PERSISTENT=0` for the legacy one-process-per-command
+  mode)
+- Every command is bounded by a default 30s timeout
+- Output capped at 1 MiB per stream with a truncation notice
+
+See [docs/performance-fixes.md](docs/performance-fixes.md) for the
+full analysis.
+
+## Environment Variables
+
+| Variable             | Default   | Purpose                                    |
+| -------------------- | --------- | ------------------------------------------ |
+| `MCP_WSL_PERSISTENT` | `1`       | `0` disables the shared session            |
+| `MCP_WSL_TIMEOUT`    | `30000`   | Default per-command timeout (ms)           |
+| `MCP_WSL_MAX_OUTPUT` | `1048576` | Per-stream output cap (bytes)              |
+| `MCP_WSL_DISTRO`     | –         | Pass a distro to `wsl.exe -d <distro>`     |
+| `MCP_WSL_SHELL`      | `bash`    | Shell executed inside WSL                  |
+| `MCP_WSL_DIRECT`     | `0`       | `1` runs the shell without wsl.exe wrapper |
+
 ## Configuration
 
 This server requires configuration through your MCP client. Here are
