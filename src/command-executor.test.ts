@@ -1,6 +1,13 @@
 import { spawn } from 'node:child_process';
 import { EventEmitter } from 'node:events';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import {
+	afterEach,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	vi,
+} from 'vitest';
 import { CommandExecutor } from './command-executor.js';
 import { wsl_config } from './constants.js';
 import {
@@ -73,7 +80,9 @@ function complete_command(
 		code = 0,
 	}: { stdout?: string; stderr?: string; code?: number },
 ) {
-	const payload = proc.stdin.write.mock.calls[call_index][0] as string;
+	const payload = proc.stdin.write.mock.calls[
+		call_index
+	][0] as string;
 	const id = payload_id(payload);
 	if (stdout) proc.stdout.emit('data', Buffer.from(stdout));
 	proc.stdout.emit(
@@ -202,6 +211,13 @@ describe('CommandExecutor (one-shot mode)', () => {
 		expect(executor.is_dangerous_command('echo safe')).toBe(false);
 		expect(executor.is_dangerous_command('format_output()')).toBe(
 			false,
+		);
+		// Backslash-escaped command names must not bypass the matcher.
+		expect(executor.is_dangerous_command('\\rm -rf /tmp/x')).toBe(
+			true,
+		);
+		expect(executor.is_dangerous_command('\\r\\m -rf /tmp/x')).toBe(
+			true,
 		);
 	});
 });

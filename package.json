@@ -32,9 +32,6 @@
 		"type": "git",
 		"url": "https://github.com/dhruvkej9/mcp-wsl-exec.git"
 	},
-	"publishConfig": {
-		"access": "public"
-	},
 	"bin": {
 		"wsl-exec-mcp": "./dist/index.js"
 	},
@@ -46,6 +43,15 @@
 	"type": "module",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js"
+		}
+	},
+	"publishConfig": {
+		"access": "public"
+	},
 	"scripts": {
 		"build": "vp pack && chmod +x dist/index.js",
 		"dev": "vp pack --watch",

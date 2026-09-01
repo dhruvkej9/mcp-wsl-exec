@@ -48,7 +48,8 @@ function new_stream_state(): StreamState {
 
 function append_collected(state: StreamState, text: string): void {
 	if (state.truncated || !text) return;
-	const remaining = wsl_config.max_output_bytes - state.collected.length;
+	const remaining =
+		wsl_config.max_output_bytes - state.collected.length;
 	if (text.length <= remaining) {
 		state.collected += text;
 		return;
@@ -72,22 +73,32 @@ export class PersistentSession {
 	private current: InFlight | null = null;
 	private chain: Promise<void> = Promise.resolve();
 	private counter = 0;
+	private pending = new Set<{
+		resolve: (result: SessionResult) => void;
+		reject: (error: Error) => void;
+	}>();
 
 	public run(
 		full_command: string,
 		timeout: number,
 	): Promise<SessionResult> {
 		return new Promise<SessionResult>((resolve, reject) => {
+			const entry = { resolve, reject };
+			this.pending.add(entry);
 			this.chain = this.chain
 				.catch(() => {
 					// A failed predecessor must not poison the queue.
 				})
 				.then(() => this.run_now(full_command, timeout))
-				.then(resolve, reject);
+				.then(resolve, reject)
+				.finally(() => this.pending.delete(entry));
 		});
 	}
 
 	public dispose(): void {
+		const error = new WslExecutionError('WSL session disposed');
+		for (const entry of this.pending) entry.reject(error);
+		this.pending.clear();
 		if (this.proc) {
 			this.proc.kill('SIGKILL');
 			this.proc = null;
@@ -95,7 +106,11 @@ export class PersistentSession {
 	}
 
 	private ensure_process(): ChildProcessWithoutNullStreams {
-		if (this.proc && this.proc.exitCode === null && !this.proc.killed) {
+		if (
+			this.proc &&
+			this.proc.exitCode === null &&
+			!this.proc.killed
+		) {
 			return this.proc;
 		}
 
@@ -199,7 +214,10 @@ export class PersistentSession {
 				this.flush_pending(state, marker.length);
 				return;
 			}
-			const close = state.pending.indexOf('__', index + marker.length);
+			const close = state.pending.indexOf(
+				'__',
+				index + marker.length,
+			);
 			if (close === -1) return; // Exit code digits still streaming.
 			append_collected(
 				state,

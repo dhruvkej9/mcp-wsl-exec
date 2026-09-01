@@ -6,6 +6,7 @@ import {
 	CommandExecutor,
 	quote_shell_arg,
 } from '../../command-executor.js';
+import { wsl_config } from '../../constants.js';
 import { InvalidConfirmationError } from '../../errors.js';
 import type {
 	CommandResponse,
@@ -61,7 +62,10 @@ export function register_tools(server: McpServer<GenericSchema>) {
 		working_dir?: string,
 		timeout?: number,
 	): Promise<CommandResponse> => {
-		if (command_executor.is_dangerous_command(command)) {
+		if (
+			wsl_config.confirm &&
+			command_executor.is_dangerous_command(command)
+		) {
 			sweep_expired_confirmations();
 			const confirmation_id = randomUUID();
 			pending_confirmations.set(confirmation_id, {

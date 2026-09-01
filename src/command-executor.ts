@@ -102,7 +102,12 @@ export class CommandExecutor {
 	}
 
 	public is_dangerous_command(command: string): boolean {
-		return danger_matchers.some((matches) => matches(command));
+		// Backslash-escaped command names (\rm, \r\m) are the same
+		// command in bash. Strip escapes before matching so they
+		// cannot bypass the matcher; erring toward more confirmation
+		// (never less) is the safe direction.
+		const normalized = command.replace(/\\/g, '');
+		return danger_matchers.some((matches) => matches(normalized));
 	}
 
 	public dispose(): void {

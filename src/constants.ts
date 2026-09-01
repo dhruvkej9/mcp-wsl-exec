@@ -60,6 +60,12 @@ export const wsl_config = {
 	 * fall back to one process per command.
 	 */
 	persistent: process.env.MCP_WSL_PERSISTENT !== '0',
+	/**
+	 * Confirmation gate for dangerous commands. Set MCP_WSL_CONFIRM=0
+	 * to execute them immediately without a confirm_command round
+	 * trip.
+	 */
+	confirm: process.env.MCP_WSL_CONFIRM !== '0',
 	/** Applied whenever a tool call does not pass a timeout. */
 	default_timeout: env_int('MCP_WSL_TIMEOUT', 30_000), // 30 seconds
 	/** Cap on captured stdout/stderr, each. */

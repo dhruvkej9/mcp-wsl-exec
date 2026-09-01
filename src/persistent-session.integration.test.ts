@@ -52,7 +52,11 @@ describe.runIf(has_bash)(
 		});
 
 		it('does not hang on commands that read stdin', async () => {
-			const result = await executor.execute_command('cat', undefined, 3000);
+			const result = await executor.execute_command(
+				'cat',
+				undefined,
+				3000,
+			);
 			expect(result.exit_code).toBe(0);
 			expect(result.stdout).toBe('');
 		});
@@ -73,9 +77,8 @@ describe.runIf(has_bash)(
 				executor.execute_command('sleep 5', undefined, 300),
 			).rejects.toBeInstanceOf(CommandTimeoutError);
 
-			const recovered = await executor.execute_command(
-				'echo recovered',
-			);
+			const recovered =
+				await executor.execute_command('echo recovered');
 			expect(recovered.stdout).toBe('recovered\n');
 		});
 
